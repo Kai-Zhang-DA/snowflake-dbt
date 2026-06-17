@@ -1,3 +1,5 @@
+-- Tasty Bytes dbt demo setup: removed external access integration (unsupported on trial accounts)
+-- Co-authored with CoCo
 -- =============================================================================
 -- Tasty Bytes dbt Demo: Environment Setup & Source Data
 -- Source: https://docs.snowflake.com/en/user-guide/tutorials/dbt-projects-on-snowflake-getting-started-tutorial
@@ -91,6 +93,15 @@ CREATE OR REPLACE API INTEGRATION tb_dbt_git_api_integration
   -- Comment out the following line if your forked repository is public
   ALLOWED_AUTHENTICATION_SECRETS = (tasty_bytes_dbt_db.integrations.tb_dbt_git_secret)
   ENABLED = TRUE;
+
+-- ================
+-- oauth
+CREATE OR REPLACE API INTEGRATION my_git_api_integration
+  API_PROVIDER = git_https_api
+  API_ALLOWED_PREFIXES = ('https://github.com')
+  API_USER_AUTHENTICATION = (TYPE = SNOWFLAKE_GITHUB_APP)
+  ENABLED = TRUE;
+-- ================
 
 -- =============================================================================
 -- STEP 5: (Optional) Create a network rule and external access integration
@@ -313,3 +324,8 @@ FROM @tasty_bytes_dbt_db.public.s3load/raw_pos/order_detail/;
 -- =============================================================================
 
 SELECT 'tasty_bytes_dbt_db setup is now complete' AS note;
+
+
+-- NOTE: External access integrations are NOT supported on trial accounts.
+-- If you need 'dbt deps' to download packages, upgrade to a paid account first,
+-- then uncomment the network rule and external access integration in STEP 5 above.
